@@ -6,9 +6,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = os.getenv('SECRET_KEY', 'key')
 
-DEBUG = os.getenv("DEBUG", 'False').lower() != 'false'
+DEBUG = True
 
-ALLOWED_HOSTS = os.getenv('HOSTS',default='').split()
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost', 'seregasvo.zapto.org']
 
 INSTALLED_APPS = [
     'django.contrib.admin',
