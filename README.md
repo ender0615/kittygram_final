@@ -1,26 +1,94 @@
-#  Как работать с репозиторием финального задания
+#  Docker Kittygram and CI/CD
+![workflow](https://github.com/ender0615/kittygram_final/actions/workflows/main.yml/badge.svg?event=push)
+### About ⭐
 
-## Что нужно сделать
+Kittygram is a social network for sharing photos of beloved pets. It is a fully functional project consisting of a Django backend application and a React frontend application.
 
-Настроить запуск проекта Kittygram в контейнерах и CI/CD с помощью GitHub Actions
+### Features 🚀
 
-## Как проверить работу с помощью автотестов
+- the project is launched with Docker containers;
+- automatic testing for compliance with PEP8;
+- if the tests pass successfully, the images are updated on Docker Hub;
+- containers are launched on the server from the updated images;
+- automation using GitHub Actions on push to the main branch.
 
-В корне репозитория создайте файл tests.yml со следующим содержимым:
-```yaml
-repo_owner: ваш_логин_на_гитхабе
-kittygram_domain: полная ссылка (https://доменное_имя) на ваш проект Kittygram
-taski_domain: полная ссылка (https://доменное_имя) на ваш проект Taski
-dockerhub_username: ваш_логин_на_докерхабе
+### Architecture
+
+![](https://pictures.s3.yandex.net/resources/s2_10_1697630524.png)
+
+Containers:
+- kittygram_gateway - gateway
+- kittygram_backend - backend
+- kittygram_frontend - frontend
+- postgres:13.10 - db
+
+Volumes:
+- `static` - for storing static files of the backend and frontend containers. Access to this volume should also be available to the gateway container so that Nginx can serve these files.
+- `media` - for storing files uploaded by users. Access to this volume should be available to both the backend and gateway containers so that Nginx can serve these files.
+- `pg_data` - for storing PostgreSQL data from the db container.
+
+### Technology stack ⚙️
+
+- Python 3.10.2
+- Django 3.2.3
+- Django REST Framework 3.12.4
+- Pytest 6.2.4
+- Gunicorn 20.1.0
+- Nginx
+- PostgreSQL 13.10
+- Docker
+
+### Installation 🛠️
+
+1. Download docker-compose.yml from https://github.com/ender0615/kittygram_final/blob/main/docker-compose.yml
+
+2. Create .env file and add environment variables
+```
+touch .env
+```
+3. Add environment variables
+
+4. Run Dockercompose
+```
+sudo docker compose -f docker-compose.yml pull
+sudo docker compose -f docker-compose.yml down
+sudo docker compose -f docker-compose.yml up -d
 ```
 
-Скопируйте содержимое файла `.github/workflows/main.yml` в файл `kittygram_workflow.yml` в корневой директории проекта.
+5. Make migrations and collect static
+```
+sudo docker compose -f docker-compose.yml exec backend python manage.py migrate
+sudo docker compose -f docker-compose.yml exec backend python manage.py collectstatic
+sudo docker compose -f docker-compose.yml exec backend cp -r /app/collected_static/. /backend_static/static/ 
+```
 
-Для локального запуска тестов создайте виртуальное окружение, установите в него зависимости из backend/requirements.txt и запустите в корневой директории проекта `pytest`.
+### Autodeploy with Git Hub Action
 
-## Чек-лист для проверки перед отправкой задания
+Add variables to repository's Secrets:
 
-- Проект Taski доступен по доменному имени, указанному в `tests.yml`.
-- Проект Kittygram доступен по доменному имени, указанному в `tests.yml`.
-- Пуш в ветку main запускает тестирование и деплой Kittygram, а после успешного деплоя вам приходит сообщение в телеграм.
-- В корне проекта есть файл `kittygram_workflow.yml`.
+- `DOCKER_PASSWORD` - Docker Hub password
+- `DOCKER_USERNAME` - Docker Hub username
+- `HOST` - Server IP
+- `SSH_KEY` - SSH-key to access server
+- `SSH_PASSPHRASE` - passphrase to access server
+- `TELEGRAM_TO` - Telegram user ID
+- `TELEGRAM_TOKEN` - Telegram user token
+- `USER` - username to access server
+
+
+### Env variables 🔑
+
+- `POSTGRES_DB` - DB
+- `POSTGRES_USER` - username to DB
+- `POSTGRES_PASSWORD` - password to DB
+- `DB_NAME` - DB name
+- `DB_HOST` = db
+- `DB_PORT` = 5432
+- `SECRET_KEY` - Django key
+- `DEBUG` - True/False
+- `ALLOWED_HOSTS`
+
+### Authors 👤
+
+- [Ratmir Khashagulgov](https://github.com/ender0615)
+- [Igor Shkoda](https://github.com/Port-tf) - reviewer

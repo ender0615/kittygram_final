@@ -3,7 +3,7 @@ name: Main Kittygram workflow
 on:
   push:
     branches:
-      - main
+      - '**'
 jobs:
   tests:
     runs-on: ubuntu-latest
@@ -22,7 +22,7 @@ jobs:
     - name: Set up Python
       uses: actions/setup-python@v4
       with:
-        python-version: 3.9
+        python-version: ["3.9", "3.10", "3.11", "3.12"]
 
     - name: Install dependencies
       run: |
@@ -59,7 +59,8 @@ jobs:
         with:
           context: ./backend/
           push: true
-          tags: ender0617/kittygram_backend:latest
+          tags: ${{ secrets.NAME }}/kittygram_backend:latest
+
   frontend_tests:
     runs-on: ubuntu-latest
 
@@ -99,7 +100,7 @@ jobs:
         with:
           context: ./frontend/
           push: true
-          tags: ender0617/kittygram_frontend:latest
+          tags: ${{ secrets.NAME }}/kittygram_frontend:latest
 
   build_gateway_and_push_to_docker_hub:
     name: Push gateway Docker image to DockerHub
@@ -119,7 +120,7 @@ jobs:
         with:
           context: ./nginx/
           push: true
-          tags: ender0617/kittygram_gateway:latest
+          tags: ${{ secrets.NAME }}/kittygram_gateway:latest
 
   deploy:
     runs-on: ubuntu-latest
